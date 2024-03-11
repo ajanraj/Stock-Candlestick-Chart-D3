@@ -49,7 +49,7 @@ function createChart(ticker) {
     .call(
       d3
         .axisLeft(y)
-        .tickFormat(d3.format("$~f"))
+        .tickFormat(d3.format("~f"))
         .tickValues(d3.scaleLinear().domain(y.domain()).ticks())
     )
     .call((g) =>
@@ -161,34 +161,70 @@ function createChart(ticker) {
         .style("visibility", "visible");
 
       // Highlight X axis value
-      const closestXValue = findClosestDate(
+      // Highlight X axis value and create a box for it
+      const closestDateObj = findClosestDate(
         mouseX,
         x,
         x.domain().map((d) => new Date(d))
       );
+      const closestDateFormatted = d3.timeFormat("%d %b")(
+        new Date(closestDateObj)
+      ); // "13 Jan" format
 
+      // Remove existing highlight box and text to prevent duplication
+      svg.selectAll(".x-axis-highlight, .x-axis-highlight-text").remove();
+
+      // Append a new rectangle as the highlight background for the x-axis
       svg
-        .selectAll(".x-axis .tick text")
-        .style("font-weight", "normal")
-        .filter((d, i, nodes) => d3.select(nodes[i]).text() === closestXValue)
-        .style("font-weight", "bold");
+        .append("rect")
+        .attr("class", "x-axis-highlight")
+        .attr("x", mouseX - 25) // Center the box around the cursor. Adjust as needed.
+        .attr("y", height - marginBottom) // Position just above the x-axis
+        .attr("width", 50) // Make sure the box is wide enough to fit the date text
+        .attr("height", 20) // Adjust the height as needed
+        .attr("fill", "grey");
+
+      // Append text over the rectangle for the x-axis
+      svg
+        .append("text")
+        .attr("class", "x-axis-highlight-text")
+        .attr("x", mouseX - 20) // Adjust this value to center the text within the box
+        .attr("y", height - marginBottom + 15) // Adjust for vertical alignment within the box
+        .attr("fill", "white")
+        .attr("font-size", "12px") // Adjust font size as needed
+        .text(closestDateFormatted);
 
       // Highlight Y axis value
-      const closestYValue = y
-        .ticks()
-        .reduce((prev, curr) =>
-          Math.abs(curr - y.invert(mouseY)) < Math.abs(prev - y.invert(mouseY))
-            ? curr
-            : prev
-        );
+      const yValue = y.invert(mouseY);
+      const formattedYValue = d3.format(".2f")(yValue);
 
+      // Remove existing highlight box and text to prevent duplication
+      svg.selectAll(".y-axis-highlight, .y-axis-highlight-text").remove();
+
+      // Append a new rectangle as the highlight background
       svg
-        .selectAll(".y-axis .tick text")
-        .style("font-weight", "normal")
-        .filter((d) => d === closestYValue)
-        .style("font-weight", "bold");
+        .append("rect")
+        .attr("class", "y-axis-highlight")
+        .attr("x", 0) // Position as needed, this example places it right next to the y-axis
+        .attr("y", mouseY - 10) // Adjust positioning based on mouse Y to align with the pointer
+        .attr("width", marginLeft - 1) // Adjust the width as needed
+        .attr("height", 20) // Adjust the height as needed
+        .attr("fill", "grey");
+
+      // Append text over the rectangle
+      svg
+        .append("text")
+        .attr("class", "y-axis-highlight-text")
+        .attr("x", 5) // Adjust for padding within the rectangle
+        .attr("y", mouseY + 5) // Center text vertically within the rectangle
+        .attr("fill", "white")
+        .attr("font-size", "12px")
+        .text(formattedYValue);
     })
     .on("mouseleave", function () {
+      // Clean up: remove highlights for both x and y axes
+      svg.selectAll(".x-axis-highlight, .x-axis-highlight-text").remove();
+      svg.selectAll(".y-axis-highlight, .y-axis-highlight-text").remove();
       crosshairX.style("visibility", "hidden");
       crosshairY.style("visibility", "hidden");
     });
