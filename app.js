@@ -40,7 +40,8 @@ function createChart(ticker) {
         )
         .tickFormat(d3.utcFormat("%-m/%-d"))
     )
-    .call((g) => g.select(".domain").remove());
+    .call((g) => g.select(".domain").remove())
+    .attr("class", "x-axis");
 
   svg
     .append("g")
@@ -58,7 +59,8 @@ function createChart(ticker) {
         .attr("stroke-opacity", 0.2)
         .attr("x2", width - marginLeft - marginRight)
     )
-    .call((g) => g.select(".domain").remove());
+    .call((g) => g.select(".domain").remove())
+    .attr("class", "y-axis");
 
   // Create a group for each day of data, and append two lines to it.
   const g = svg
@@ -101,6 +103,95 @@ function createChart(ticker) {
   Low: ${formatValue(d.Low)}
   High: ${formatValue(d.High)}`
   );
+
+  // Assuming your x-axis uses a scaleBand for dates...
+  function findClosestDate(mouseX, scale, dates) {
+    const eachBand = scale.step(); // Width of each band
+    const index = Math.floor((mouseX - scale.range()[0]) / eachBand);
+    // Ensure the index is within the bounds of the dates array
+    const boundedIndex = Math.max(0, Math.min(index, dates.length - 1));
+    // Format the date to match the axis tick labels
+    return d3.utcFormat("%-m/%-d")(dates[boundedIndex]);
+  }
+
+  // Append crosshair lines, initially hidden
+  const crosshairX = svg
+    .append("line")
+    .attr("class", "crosshair")
+    .attr("stroke", "grey")
+    .attr("stroke-width", 1)
+    .attr("stroke-dasharray", "3,3")
+    .style("visibility", "hidden");
+
+  const crosshairY = svg
+    .append("line")
+    .attr("class", "crosshair")
+    .attr("stroke", "grey")
+    .attr("stroke-width", 1)
+    .attr("stroke-dasharray", "3,3")
+    .style("visibility", "hidden");
+
+  // Overlay to capture mouse events
+  const mouseG = svg.append("g").attr("class", "mouse-over-effects");
+
+  mouseG
+    .append("rect") // append a rect to catch mouse movements
+    .attr("width", width)
+    .attr("height", height)
+    .attr("fill", "none")
+    .attr("pointer-events", "all")
+    .on("mousemove", function (event) {
+      const mouse = d3.pointer(event);
+      const mouseX = mouse[0];
+      const mouseY = mouse[1];
+
+      // Update crosshair lines position
+      crosshairX
+        .attr("x1", mouseX)
+        .attr("x2", mouseX)
+        .attr("y1", marginTop)
+        .attr("y2", height - marginBottom)
+        .style("visibility", "visible");
+
+      crosshairY
+        .attr("x1", marginLeft)
+        .attr("x2", width - marginRight)
+        .attr("y1", mouseY)
+        .attr("y2", mouseY)
+        .style("visibility", "visible");
+
+      // Highlight X axis value
+      const closestXValue = findClosestDate(
+        mouseX,
+        x,
+        x.domain().map((d) => new Date(d))
+      );
+
+      svg
+        .selectAll(".x-axis .tick text")
+        .style("font-weight", "normal")
+        .filter((d, i, nodes) => d3.select(nodes[i]).text() === closestXValue)
+        .style("font-weight", "bold");
+
+      // Highlight Y axis value
+      const closestYValue = y
+        .ticks()
+        .reduce((prev, curr) =>
+          Math.abs(curr - y.invert(mouseY)) < Math.abs(prev - y.invert(mouseY))
+            ? curr
+            : prev
+        );
+
+      svg
+        .selectAll(".y-axis .tick text")
+        .style("font-weight", "normal")
+        .filter((d) => d === closestYValue)
+        .style("font-weight", "bold");
+    })
+    .on("mouseleave", function () {
+      crosshairX.style("visibility", "hidden");
+      crosshairY.style("visibility", "hidden");
+    });
 
   return svg.node();
 }
