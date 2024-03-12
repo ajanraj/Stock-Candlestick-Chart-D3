@@ -5,7 +5,7 @@ function createChart(ticker) {
   const marginTop = 20;
   const marginRight = 30;
   const marginBottom = 30;
-  const marginLeft = 40;
+  const marginLeft = 60;
 
   // Declare the positional encodings.
   const x = d3
@@ -29,7 +29,7 @@ function createChart(ticker) {
   // Append the axes.
   svg
     .append("g")
-    .attr("transform", `translate(0,${height - marginBottom})`)
+    .attr("transform", `translate(0,${height - marginBottom + 2})`)
     .call(
       d3
         .axisBottom(x)
@@ -40,12 +40,12 @@ function createChart(ticker) {
         )
         .tickFormat(d3.utcFormat("%-m/%-d"))
     )
-    .call((g) => g.select(".domain").remove())
+    // .call((g) => g.select(".domain").remove())
     .attr("class", "x-axis");
 
   svg
     .append("g")
-    .attr("transform", `translate(${marginLeft},0)`)
+    .attr("transform", `translate(${marginLeft - 20},0)`)
     .call(
       d3
         .axisLeft(y)
@@ -59,7 +59,7 @@ function createChart(ticker) {
         .attr("stroke-opacity", 0.2)
         .attr("x2", width - marginLeft - marginRight)
     )
-    .call((g) => g.select(".domain").remove())
+    // .call((g) => g.select(".domain").remove())
     .attr("class", "y-axis");
 
   // Create a group for each day of data, and append two lines to it.
@@ -70,7 +70,7 @@ function createChart(ticker) {
     .selectAll("g")
     .data(ticker)
     .join("g")
-    .attr("transform", (d) => `translate(${x(d.Date)},0)`);
+    .attr("transform", (d) => `translate(${x(d.Date) + x.bandwidth() / 2},0)`);
 
   g.append("line")
     .attr("y1", (d) => y(d.Low))
@@ -149,10 +149,16 @@ function createChart(ticker) {
       const eachBand = x.step();
       const index = Math.round((mouseX - x.range()[0]) / eachBand);
       const boundedIndex = Math.max(0, Math.min(index, ticker.length - 1));
-      const closestDate = ticker[boundedIndex].Date;
+      // Adjust this to find the nearest band to the mouse pointer
+      const closestBandIndex = d3.scan(ticker, (a, b) => {
+        return (
+          Math.abs(x(a.Date) + x.bandwidth() / 2 - mouseX) -
+          Math.abs(x(b.Date) + x.bandwidth() / 2 - mouseX)
+        );
+      });
 
-      // Use the x position of the closest date for the crosshair
-      const closestX = x(closestDate) + x.bandwidth() / 20 - 0.8; // Center of the band
+      const closestDate = ticker[closestBandIndex].Date;
+      const closestX = x(closestDate) + x.bandwidth() / 2;
 
       // Update crosshair lines position to snap to the closest date
       crosshairX
