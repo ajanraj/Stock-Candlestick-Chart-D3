@@ -145,10 +145,19 @@ function createChart(ticker) {
       const mouseX = mouse[0];
       const mouseY = mouse[1];
 
-      // Update crosshair lines position
+      // Find the closest date based on mouseX
+      const eachBand = x.step();
+      const index = Math.round((mouseX - x.range()[0]) / eachBand);
+      const boundedIndex = Math.max(0, Math.min(index, ticker.length - 1));
+      const closestDate = ticker[boundedIndex].Date;
+
+      // Use the x position of the closest date for the crosshair
+      const closestX = x(closestDate) + x.bandwidth() / 20 - 0.8; // Center of the band
+
+      // Update crosshair lines position to snap to the closest date
       crosshairX
-        .attr("x1", mouseX)
-        .attr("x2", mouseX)
+        .attr("x1", closestX)
+        .attr("x2", closestX)
         .attr("y1", marginTop)
         .attr("y2", height - marginBottom)
         .style("visibility", "visible");
