@@ -20,8 +20,17 @@ function createChart(ticker) {
 
   const y = d3
     .scaleLog()
-    .domain([d3.min(ticker, (d) => d.Low), d3.max(ticker, (d) => d.High)])
+    .domain([
+      d3.min(ticker, (d) => d.Low - 1),
+      d3.max(ticker, (d) => d.High + 1),
+    ])
     .rangeRound([height - marginBottom, marginTop]);
+
+  // Additional scale for the volume data
+  const yVolume = d3
+    .scaleLinear()
+    .domain([0, d3.max(ticker, (d) => d.Volume)])
+    .range([height - marginBottom, height * 0.75]); // Adjust the range as needed
 
   // Create the SVG container.
   const svg = d3.create("svg").attr("viewBox", [0, 0, width, height]);
@@ -29,7 +38,7 @@ function createChart(ticker) {
   // Append the axes.
   svg
     .append("g")
-    .attr("transform", `translate(0,${height - marginBottom + 2})`)
+    .attr("transform", `translate(0,${height - marginBottom})`)
     .call(
       d3
         .axisBottom(x)
@@ -45,7 +54,7 @@ function createChart(ticker) {
 
   svg
     .append("g")
-    .attr("transform", `translate(${marginLeft - 20},0)`)
+    .attr("transform", `translate(${marginLeft},0)`)
     .call(
       d3
         .axisLeft(y)
@@ -61,6 +70,26 @@ function createChart(ticker) {
     )
     // .call((g) => g.select(".domain").remove())
     .attr("class", "y-axis");
+
+  // Append the volume axis (right side)
+  // svg
+  //   .append("g")
+  //   .attr("transform", `translate(${width - marginRight},0)`)
+  //   .call(d3.axisRight(yVolume).ticks(3)) // Adjust tick count as needed
+  //   .attr("class", "volume-axis");
+
+  // Drawing volume bars
+  svg
+    .append("g")
+    .selectAll("rect")
+    .data(ticker)
+    .join("rect")
+    .attr("x", (d) => x(d.Date))
+    .attr("y", (d) => yVolume(d.Volume))
+    .attr("height", (d) => height - marginBottom - yVolume(d.Volume))
+    .attr("width", x.bandwidth())
+    .attr("fill", (d) => (d.Close > d.Open ? "green" : "red"))
+    .attr("opacity", 0.3); // Adjust opacity as needed
 
   // Create a group for each day of data, and append two lines to it.
   const g = svg
