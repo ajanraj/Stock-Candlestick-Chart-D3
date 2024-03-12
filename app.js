@@ -88,6 +88,15 @@ function createChart(ticker) {
         : d3.schemeSet1[8]
     );
 
+  // Add a static title element to the SVG container
+  const chartTitle = svg
+    .append("text")
+    .attr("x", marginLeft - 10)
+    .attr("y", marginTop - 5) // Position it slightly above the chart area
+    .attr("class", "chart-title")
+    .style("font-size", "16px")
+    .text("Stock Data Overview"); // Initial static text
+
   // Append a title (tooltip).
   const formatDate = d3.utcFormat("%B %-d, %Y");
   const formatValue = d3.format(".2f");
@@ -235,11 +244,25 @@ function createChart(ticker) {
         .attr("fill", "white")
         .attr("font-size", "12px")
         .text(formattedYValue);
+
+      chartTitle.text((d) => {
+        // Find the data for the closest date
+        const dataForClosestDate = ticker.find(
+          (data) => data.Date.getTime() === closestDate.getTime()
+        );
+        // Format the title string with relevant information
+        return `Open: ${formatValue(
+          dataForClosestDate.Open
+        )} - High: ${formatValue(dataForClosestDate.High)} - Low: ${formatValue(
+          dataForClosestDate.Low
+        )} - Close: ${formatValue(dataForClosestDate.Close)}`;
+      });
     })
     .on("mouseleave", function () {
       // Clean up: remove highlights for both x and y axes
       svg.selectAll(".x-axis-highlight, .x-axis-highlight-text").remove();
       svg.selectAll(".y-axis-highlight, .y-axis-highlight-text").remove();
+      chartTitle.text("Stock Data Overview");
       crosshairX.style("visibility", "hidden");
       crosshairY.style("visibility", "hidden");
     });
