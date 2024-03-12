@@ -274,19 +274,66 @@ function createChart(ticker) {
         .attr("font-size", "12px")
         .text(formattedYValue);
 
-      chartTitle.text((d) => {
-        // Find the data for the closest date
-        const dataForClosestDate = ticker.find(
-          (data) => data.Date.getTime() === closestDate.getTime()
+      // Inside the mousemove event handler, after finding the closest data point
+
+      const dataForClosestDate = ticker.find(
+        (data) => data.Date.getTime() === closestDate.getTime()
+      );
+
+      // Clear existing text to avoid duplication
+      chartTitle.text("");
+
+      // Set base text color for labels
+      chartTitle.attr("fill", "black");
+
+      // Add dynamic text as tspans
+      chartTitle.append("tspan").text("Open: ");
+      chartTitle
+        .append("tspan")
+        .attr(
+          "fill",
+          dataForClosestDate.Close > dataForClosestDate.Open ? "green" : "red"
+        )
+        .text(`${formatValue(dataForClosestDate.Open)}`);
+
+      chartTitle.append("tspan").text(" | High: ");
+      chartTitle
+        .append("tspan")
+        .attr(
+          "fill",
+          dataForClosestDate.Close > dataForClosestDate.Open ? "green" : "red"
+        )
+        .text(`${formatValue(dataForClosestDate.High)}`);
+
+      chartTitle.append("tspan").text(" | Low: ");
+      chartTitle
+        .append("tspan")
+        .attr(
+          "fill",
+          dataForClosestDate.Close > dataForClosestDate.Open ? "green" : "red"
+        )
+        .text(`${formatValue(dataForClosestDate.Low)}`);
+
+      chartTitle.append("tspan").text(" | Close: ");
+      chartTitle
+        .append("tspan")
+        .attr(
+          "fill",
+          dataForClosestDate.Close > dataForClosestDate.Open ? "green" : "red"
+        )
+        .text(`${formatValue(dataForClosestDate.Close)}`);
+
+      chartTitle.append("tspan").text(" | Change: ");
+      chartTitle
+        .append("tspan")
+        .attr("fill", dataForClosestDate.Change >= 0 ? "green" : "red") // Assuming positive change is green, negative is red
+        .text(
+          `${formatValue(dataForClosestDate.Change)} (${formatValue(
+            dataForClosestDate.ChangePercent
+          )}%)`
         );
-        // Format the title string with relevant information
-        return `Open: ${formatValue(
-          dataForClosestDate.Open
-        )} - High: ${formatValue(dataForClosestDate.High)} - Low: ${formatValue(
-          dataForClosestDate.Low
-        )} - Close: ${formatValue(dataForClosestDate.Close)}`;
-      });
     })
+
     .on("mouseleave", function () {
       // Clean up: remove highlights for both x and y axes
       svg.selectAll(".x-axis-highlight, .x-axis-highlight-text").remove();
@@ -310,6 +357,8 @@ d3.csv("test.csv")
       Low: +d.low,
       Close: +d.close,
       Volume: +d.volume,
+      Change: +d.change,
+      ChangePercent: +d.changePercent,
       // Add other fields if necessary
     }));
 
