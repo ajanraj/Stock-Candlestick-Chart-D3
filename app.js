@@ -71,12 +71,12 @@ function createChart(ticker) {
     // .call((g) => g.select(".domain").remove())
     .attr("class", "y-axis");
 
-  // Append the volume axis (right side)
-  // svg
-  //   .append("g")
-  //   .attr("transform", `translate(${width - marginRight},0)`)
-  //   .call(d3.axisRight(yVolume).ticks(3)) // Adjust tick count as needed
-  //   .attr("class", "volume-axis");
+  Append the volume axis (right side)
+  svg
+    .append("g")
+    .attr("transform", `translate(${width - marginRight},0)`)
+    .call(d3.axisRight(yVolume).ticks(3)) // Adjust tick count as needed
+    .attr("class", "volume-axis");
 
   // Drawing volume bars
   svg
