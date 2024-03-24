@@ -346,27 +346,46 @@ function createChart(ticker) {
   return svg.node();
 }
 
-// Load and parse the CSV file
-d3.csv("test.csv")
-  .then((data) => {
-    // Convert date strings to Date objects and numerical strings to numbers
-    const ticker = data.map((d) => ({
-      Date: d3.utcParse("%Y-%m-%d")(d.date), // Adjust date format as needed
-      Open: +d.open,
-      High: +d.high,
-      Low: +d.low,
-      Close: +d.close,
-      Volume: +d.volume,
-      Change: +d.change,
-      ChangePercent: +d.changePercent,
-      // Add other fields if necessary
-    }));
-
-    // Now `ticker` is ready to be used with your chart code
-    // For example, you can call your chart function here
-    const chart = createChart(ticker); // Assuming your chart code is encapsulated in a function
-    document.body.append(chart); // Append the chart to the document body or another DOM element
-  })
-  .catch((error) => {
-    console.log(error);
+document
+  .getElementById("stock-selector")
+  .addEventListener("change", function () {
+    const selectedFile = this.value; // Get the selected file from the dropdown
+    loadAndDisplayChart("./Data/" + selectedFile); // Load and display the chart for the selected file
   });
+
+// Function to load and parse the CSV file, then display the chart
+function loadAndDisplayChart(csvFile) {
+  d3.csv(csvFile)
+    .then((data) => {
+      // Convert date strings to Date objects and numerical strings to numbers, then take the first 30 entries
+      const ticker = data
+        .map((d) => ({
+          Date: d3.utcParse("%Y-%m-%d")(d.date), // Adjust date format as needed
+          Open: +d.open,
+          High: +d.high,
+          Low: +d.low,
+          Close: +d.close,
+          Volume: +d.volume,
+          Change: +d.change,
+          ChangePercent: +d.changePercent,
+          // Add other fields if necessary
+        }))
+        .slice(0, 60); // Adjust the number of entries as needed
+
+      // Now `ticker` is ready to be used with your chart code
+      const chart = createChart(ticker); // Assuming your chart code is encapsulated in a function
+
+      // Clear the previous chart before appending the new one
+      const chartContainer = document.getElementById("chart");
+      chartContainer.innerHTML = ""; // Clear the container
+      chartContainer.appendChild(chart); // Append the new chart
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+// Initially load the chart for the first CSV file listed in the dropdown
+loadAndDisplayChart(
+  "./Data/" + document.getElementById("stock-selector").value
+);
