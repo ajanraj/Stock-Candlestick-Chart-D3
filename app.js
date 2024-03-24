@@ -10,11 +10,7 @@ function createChart(ticker) {
   // Declare the positional encodings.
   const x = d3
     .scaleBand()
-    .domain(
-      d3.utcDay
-        .range(ticker.at(0).Date, +ticker.at(-1).Date + 1)
-        .filter((d) => d.getUTCDay() !== 0 && d.getUTCDay() !== 6)
-    )
+    .domain(ticker.map((d) => d.Date)) // Use the dates directly from your data
     .range([marginLeft, width - marginRight])
     .padding(0.2);
 
