@@ -2,7 +2,7 @@ function createChart(ticker) {
   // Declare the chart dimensions and margins.
   const width = 928;
   const height = 600;
-  const marginTop = 20;
+  const marginTop = 40;
   const marginRight = 30;
   const marginBottom = 30;
   const marginLeft = 60;
@@ -121,10 +121,19 @@ function createChart(ticker) {
   const chartTitle = svg
     .append("text")
     .attr("x", marginLeft - 10)
-    .attr("y", marginTop - 5) // Position it slightly above the chart area
+    .attr("y", marginTop - 25) // Position it slightly above the chart area
     .attr("class", "chart-title")
     .style("font-size", "16px")
     .text("Stock Data Overview"); // Initial static text
+
+  // Add a static title element to the SVG container
+  const chartSecondTitle = svg
+    .append("text")
+    .attr("x", marginLeft - 10)
+    .attr("y", marginTop - 8) // Position it slightly above the chart area
+    .attr("class", "chart-title")
+    .style("font-size", "16px")
+    .text(""); // Initial static text
 
   // Append a title (tooltip).
   const formatDate = d3.utcFormat("%B %-d, %Y");
@@ -332,6 +341,15 @@ function createChart(ticker) {
             dataForClosestDate.ChangePercent
           )}%)`
         );
+
+      chartSecondTitle.text("");
+
+      // Add a second title for the volume data
+      chartSecondTitle.append("tspan").text("Volume: ");
+      chartSecondTitle
+        .append("tspan")
+        .attr("fill", dataForClosestDate.Change >= 0 ? "green" : "red") // Assuming positive change is green, negative is red
+        .text(dataForClosestDate.Volume);
     })
 
     .on("mouseleave", function () {
@@ -341,6 +359,7 @@ function createChart(ticker) {
       chartTitle.text("Stock Data Overview");
       crosshairX.style("visibility", "hidden");
       crosshairY.style("visibility", "hidden");
+      chartSecondTitle.text("");
     });
 
   return svg.node();
