@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Data Visualization</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
     <script src="https://d3js.org/d3.v7.js"></script>
-</head>
-<body>
-    <h1>Data Visualization with D3</h1>
-    <select id="stock-selector">
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="my-4">Data Visualization with D3</h1>
+      <div class="row">
+        <div class="col-12">
+          <select id="stock-selector" class="form-control mb-3">
             <option value="AAPL.csv">Apple Inc.</option>
             <option value="AXP.csv">American Express</option>
             <option value="BA.csv">Boeing</option>
@@ -38,11 +45,17 @@
             <option value="WBA.csv">Walgreens Boots Alliance</option>
             <option value="WMT.csv">Walmart</option>
             <option value="XOM.csv">Exxon Mobile</option>
-        </select>
-      
-      <div id="chart"></div> 
+          </select>
+        </div>
+      </div>
 
-    <script src="app.js"></script>
-</body>
+      <div class="row">
+        <div class="col-lg-12">
+          <div id="chart" class="responsive-chart"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="javascript/candlestick.js"></script>
+  </body>
 </html>
-

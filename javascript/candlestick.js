@@ -1,6 +1,8 @@
 function createChart(ticker) {
   // Declare the chart dimensions and margins.
   const width = 928;
+  // const width = 1024;
+  const totalWidth = width * 6;
   const height = 600;
   const marginTop = 40;
   const marginRight = 30;
@@ -11,7 +13,7 @@ function createChart(ticker) {
   const x = d3
     .scaleBand()
     .domain(ticker.map((d) => d.Date)) // Use the dates directly from your data
-    .range([marginLeft, width - marginRight])
+    .range([0, totalWidth])
     .padding(0.2);
 
   const y = d3
@@ -28,27 +30,51 @@ function createChart(ticker) {
     .domain([0, d3.max(ticker, (d) => d.Volume)])
     .range([height - marginBottom, height * 0.75]); // Adjust the range as needed
 
-  // Create the SVG container.
-  const svg = d3.create("svg").attr("viewBox", [0, 0, width, height]);
+  const parent = d3
+    .create("div")
+    .style("position", "relative")
+    .style("width", "100%");
 
-  // Append the axes.
-  svg
-    .append("g")
-    .attr("transform", `translate(0,${height - marginBottom})`)
-    .call(
-      d3
-        .axisBottom(x)
-        .tickValues(
-          d3.utcMonday
-            .every(width > 720 ? 1 : 2)
-            .range(ticker.at(0).Date, ticker.at(-1).Date)
-        )
-        .tickFormat(d3.utcFormat("%-m/%-d"))
-    )
-    // .call((g) => g.select(".domain").remove())
-    .attr("class", "x-axis");
+  const stats = parent
+    .append("svg")
+    .attr("width", "width")
+    .attr("height", 35)
+    // .style("position", "absolute")
+    // .style("padding", "10px")
+    .style("margin-top", "10px")
+    .style("margin-bottom", "1px")
+    .style("display", "block");
 
-  svg
+  // Add a static title element to the SVG container
+  const chartTitle = stats
+    .append("text")
+    .attr("x", marginLeft - 10)
+    .attr("y", marginTop - 25) // Position it slightly above the chart area
+    .attr("class", "chart-title")
+    .style("font-size", "16px")
+    .text("Stock Data Overview"); // Initial static text
+
+  // Add a static title element to the SVG container
+  const chartSecondTitle = stats
+    .append("text")
+    .attr("x", marginLeft - 10)
+    .attr("y", marginTop - 8) // Position it slightly above the chart area
+    .attr("class", "chart-title")
+    .style("font-size", "16px")
+    .text(""); // Initial static text
+
+  // const svg = d3.create("svg").attr("viewBox", [0, 0, width, height]);
+
+  // Create the svg with the vertical axis.
+  const static = parent
+    .append("svg")
+    .attr("width", "100%")
+    .attr("height", height)
+    // .attr("viewBox", [0, 0, width, height])
+    .style("position", "absolute")
+    .style("pointer-events", "none")
+    .style("z-index", 1)
+    // Y axis
     .append("g")
     .attr("transform", `translate(${marginLeft},0)`)
     .call(
@@ -62,17 +88,46 @@ function createChart(ticker) {
         .selectAll(".tick line")
         .clone()
         .attr("stroke-opacity", 0.2)
-        .attr("x2", width - marginLeft - marginRight)
+        .attr("x2", totalWidth - marginLeft - marginRight)
     )
-    // .call((g) => g.select(".domain").remove())
+    .call((g) => g.select(".domain").remove())
     .attr("class", "y-axis");
 
-  // Append the volume axis (right side)
-  // svg
-  //   .append("g")
-  //   .attr("transform", `translate(${width - marginRight},0)`)
-  //   .call(d3.axisRight(yVolume).ticks(3)) // Adjust tick count as needed
-  //   .attr("class", "volume-axis");
+  // Create a scrolling div containing the area shape and the horizontal axis.
+
+  const body = parent
+    .append("div")
+    // .attr("viewBox", [0, 0, width, height])
+    .style("margin-left", marginLeft + "px")
+    // .style("margin-right", "50px")
+    .style("overflow-x", "scroll")
+    .style("-webkit-overflow-scrolling", "touch");
+
+  // Create the SVG container.
+  // const svg = d3.create("svg").attr("viewBox", [0, 0, width, height]);
+
+  const svg = body
+    .append("svg")
+    .attr("width", totalWidth)
+    .attr("height", height)
+    .style("display", "block");
+
+  // const svg = abc.append("g").attr("transform", `translate(${15},${0})`);
+
+  // Append the x axes.
+  // Append the x axes with ticks for every seventh data point.
+  svg
+    .append("g")
+    .attr("transform", `translate(0,${height - marginBottom})`)
+    .call(
+      d3
+        .axisBottom(x)
+        .tickValues(
+          ticker.filter((_, index) => index % 7 === 0).map((d) => d.Date)
+        )
+        .tickFormat(d3.utcFormat("%-m/%-d"))
+    )
+    .attr("class", "x-axis");
 
   // Drawing volume bars
   svg
@@ -112,24 +167,6 @@ function createChart(ticker) {
         ? d3.schemeSet1[2]
         : d3.schemeSet1[8]
     );
-
-  // Add a static title element to the SVG container
-  const chartTitle = svg
-    .append("text")
-    .attr("x", marginLeft - 10)
-    .attr("y", marginTop - 25) // Position it slightly above the chart area
-    .attr("class", "chart-title")
-    .style("font-size", "16px")
-    .text("Stock Data Overview"); // Initial static text
-
-  // Add a static title element to the SVG container
-  const chartSecondTitle = svg
-    .append("text")
-    .attr("x", marginLeft - 10)
-    .attr("y", marginTop - 8) // Position it slightly above the chart area
-    .attr("class", "chart-title")
-    .style("font-size", "16px")
-    .text(""); // Initial static text
 
   // Append a title (tooltip).
   const formatDate = d3.utcFormat("%B %-d, %Y");
@@ -179,7 +216,7 @@ function createChart(ticker) {
 
   mouseG
     .append("rect") // append a rect to catch mouse movements
-    .attr("width", width)
+    .attr("width", totalWidth)
     .attr("height", height)
     .attr("fill", "none")
     .attr("pointer-events", "all")
@@ -212,8 +249,8 @@ function createChart(ticker) {
         .style("visibility", "visible");
 
       crosshairY
-        .attr("x1", marginLeft)
-        .attr("x2", width - marginRight)
+        .attr("x1", marginLeft - 60)
+        .attr("x2", totalWidth)
         .attr("y1", mouseY)
         .attr("y2", mouseY)
         .style("visibility", "visible");
@@ -257,23 +294,23 @@ function createChart(ticker) {
       const formattedYValue = d3.format(".2f")(yValue);
 
       // Remove existing highlight box and text to prevent duplication
-      svg.selectAll(".y-axis-highlight, .y-axis-highlight-text").remove();
+      static.selectAll(".y-axis-highlight, .y-axis-highlight-text").remove();
 
       // Append a new rectangle as the highlight background
-      svg
+      static
         .append("rect")
         .attr("class", "y-axis-highlight")
-        .attr("x", 0) // Position as needed, this example places it right next to the y-axis
+        .attr("x", -65) // Position as needed, this example places it right next to the y-axis
         .attr("y", mouseY - 10) // Adjust positioning based on mouse Y to align with the pointer
-        .attr("width", marginLeft - 1) // Adjust the width as needed
+        .attr("width", marginLeft) // Adjust the width as needed
         .attr("height", 20) // Adjust the height as needed
         .attr("fill", "grey");
 
       // Append text over the rectangle
-      svg
+      static
         .append("text")
         .attr("class", "y-axis-highlight-text")
-        .attr("x", 5) // Adjust for padding within the rectangle
+        .attr("x", -15) // Adjust for padding within the rectangle
         .attr("y", mouseY + 5) // Center text vertically within the rectangle
         .attr("fill", "white")
         .attr("font-size", "12px")
@@ -295,7 +332,7 @@ function createChart(ticker) {
       chartTitle.append("tspan").text("Open: ");
       chartTitle
         .append("tspan")
-        .attr(
+        .style(
           "fill",
           dataForClosestDate.Close > dataForClosestDate.Open ? "green" : "red"
         )
@@ -341,7 +378,7 @@ function createChart(ticker) {
       chartSecondTitle.text("");
 
       // Add a second title for the volume data
-      chartSecondTitle.append("tspan").text("Volume: ");
+      chartSecondTitle.append("tspan").text(" Volume: ");
       chartSecondTitle
         .append("tspan")
         .attr("fill", dataForClosestDate.Change >= 0 ? "green" : "red") // Assuming positive change is green, negative is red
@@ -351,14 +388,14 @@ function createChart(ticker) {
     .on("mouseleave", function () {
       // Clean up: remove highlights for both x and y axes
       svg.selectAll(".x-axis-highlight, .x-axis-highlight-text").remove();
-      svg.selectAll(".y-axis-highlight, .y-axis-highlight-text").remove();
+      static.selectAll(".y-axis-highlight, .y-axis-highlight-text").remove();
       chartTitle.text("Stock Data Overview");
       crosshairX.style("visibility", "hidden");
       crosshairY.style("visibility", "hidden");
       chartSecondTitle.text("");
     });
 
-  return svg.node();
+  return parent.node();
 }
 
 document
@@ -373,19 +410,18 @@ function loadAndDisplayChart(csvFile) {
   d3.csv(csvFile)
     .then((data) => {
       // Convert date strings to Date objects and numerical strings to numbers, then take the first 30 entries
-      const ticker = data
-        .map((d) => ({
-          Date: d3.utcParse("%Y-%m-%d")(d.date), // Adjust date format as needed
-          Open: +d.open,
-          High: +d.high,
-          Low: +d.low,
-          Close: +d.close,
-          Volume: +d.volume,
-          Change: +d.change,
-          ChangePercent: +d.changePercent,
-          // Add other fields if necessary
-        }))
-        .slice(0, 60); // Adjust the number of entries as needed
+      const ticker = data.map((d) => ({
+        Date: d3.utcParse("%Y-%m-%d")(d.date), // Adjust date format as needed
+        Open: +d.open,
+        High: +d.high,
+        Low: +d.low,
+        Close: +d.close,
+        Volume: +d.volume,
+        Change: +d.change,
+        ChangePercent: +d.changePercent,
+        // Add other fields if necessary
+      }));
+      // .slice(0, 1000); // Adjust the number of entries as needed
 
       // Now `ticker` is ready to be used with your chart code
       const chart = createChart(ticker); // Assuming your chart code is encapsulated in a function
@@ -402,5 +438,5 @@ function loadAndDisplayChart(csvFile) {
 
 // Initially load the chart for the first CSV file listed in the dropdown
 loadAndDisplayChart(
-  "./Data/" + document.getElementById("stock-selector").value
+  "./data/" + document.getElementById("stock-selector").value
 );
