@@ -2,7 +2,7 @@ function createChart(ticker) {
   // Declare the chart dimensions and margins.
   const width = 928;
   // const width = 1024;
-  const totalWidth = width * 6;
+  const totalWidth = width * 15;
   const height = 600;
   const marginTop = 40;
   const marginRight = 30;
@@ -37,10 +37,8 @@ function createChart(ticker) {
 
   const stats = parent
     .append("svg")
-    .attr("width", "width")
+    .attr("width", "100%")
     .attr("height", 35)
-    // .style("position", "absolute")
-    // .style("padding", "10px")
     .style("margin-top", "10px")
     .style("margin-bottom", "1px")
     .style("display", "block");
@@ -48,7 +46,7 @@ function createChart(ticker) {
   // Add a static title element to the SVG container
   const chartTitle = stats
     .append("text")
-    .attr("x", marginLeft - 10)
+    // .attr("x", 0)
     .attr("y", marginTop - 25) // Position it slightly above the chart area
     .attr("class", "chart-title")
     .style("font-size", "16px")
@@ -57,8 +55,8 @@ function createChart(ticker) {
   // Add a static title element to the SVG container
   const chartSecondTitle = stats
     .append("text")
-    .attr("x", marginLeft - 10)
-    .attr("y", marginTop - 8) // Position it slightly above the chart area
+    // .attr("x", marginLeft - 10)
+    .attr("y", marginTop - 5) // Position it slightly above the chart area
     .attr("class", "chart-title")
     .style("font-size", "16px")
     .text(""); // Initial static text
@@ -99,7 +97,6 @@ function createChart(ticker) {
     .append("div")
     // .attr("viewBox", [0, 0, width, height])
     .style("margin-left", marginLeft + "px")
-    // .style("margin-right", "50px")
     .style("overflow-x", "scroll")
     .style("-webkit-overflow-scrolling", "touch");
 
@@ -125,7 +122,7 @@ function createChart(ticker) {
         .tickValues(
           ticker.filter((_, index) => index % 7 === 0).map((d) => d.Date)
         )
-        .tickFormat(d3.utcFormat("%-m/%-d"))
+        .tickFormat(d3.utcFormat("%-m/%-d/%-y"))
     )
     .attr("class", "x-axis");
 
@@ -402,7 +399,7 @@ document
   .getElementById("stock-selector")
   .addEventListener("change", function () {
     const selectedFile = this.value; // Get the selected file from the dropdown
-    loadAndDisplayChart("./Data/" + selectedFile); // Load and display the chart for the selected file
+    loadAndDisplayChart("../Data/" + selectedFile); // Load and display the chart for the selected file
   });
 
 // Function to load and parse the CSV file, then display the chart
@@ -421,7 +418,7 @@ function loadAndDisplayChart(csvFile) {
         ChangePercent: +d.changePercent,
         // Add other fields if necessary
       }));
-      // .slice(0, 1000); // Adjust the number of entries as needed
+      // .slice(0, 500); // Adjust the number of entries as needed
 
       // Now `ticker` is ready to be used with your chart code
       const chart = createChart(ticker); // Assuming your chart code is encapsulated in a function
@@ -438,5 +435,5 @@ function loadAndDisplayChart(csvFile) {
 
 // Initially load the chart for the first CSV file listed in the dropdown
 loadAndDisplayChart(
-  "./data/" + document.getElementById("stock-selector").value
+  "../data/" + document.getElementById("stock-selector").value
 );
