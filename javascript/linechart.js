@@ -165,7 +165,6 @@ document
 function loadAndDisplayChart(csvFile) {
   d3.csv(csvFile)
     .then((data) => {
-      // Convert date strings to Date objects and numerical strings to numbers, then take the first 30 entries
       const ticker = data.map((d) => ({
         Date: d3.utcParse("%Y-%m-%d")(d.date), // Adjust date format as needed
         Open: +d.open,
@@ -175,14 +174,9 @@ function loadAndDisplayChart(csvFile) {
         Volume: +d.volume,
         Change: +d.change,
         ChangePercent: +d.changePercent,
-        // Add other fields if necessary
       }));
-      // .slice(0, 500); // Adjust the number of entries as needed
 
-      // Now `ticker` is ready to be used with your chart code
-      const chart = createChart(ticker); // Assuming your chart code is encapsulated in a function
-
-      // Clear the previous chart before appending the new one
+      const chart = createChart(ticker); // Create the chart
       const chartContainer = document.getElementById("close-chart");
       chartContainer.innerHTML = ""; // Clear the container
       chartContainer.appendChild(chart); // Append the new chart
