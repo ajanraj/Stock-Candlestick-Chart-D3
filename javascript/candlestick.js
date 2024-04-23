@@ -137,7 +137,7 @@ function createChart(ticker) {
     .attr("height", (d) => height - marginBottom - yVolume(d.Volume))
     .attr("width", x.bandwidth())
     .attr("fill", (d) => (d.Close > d.Open ? "green" : "red"))
-    .attr("opacity", 0.3); // Adjust opacity as needed
+    .attr("opacity", 0.2); // Adjust opacity as needed
 
   // Create a group for each day of data, and append two lines to it.
   const g = svg
@@ -418,9 +418,8 @@ function loadAndDisplayChart(csvFile) {
         ChangePercent: +d.changePercent,
         // Add other fields if necessary
       }));
-      // .slice(0, 500); // Adjust the number of entries as needed
+      // .slice(0, 1000); // Adjust the number of entries as needed
 
-      // Now `ticker` is ready to be used with your chart code
       const chart = createChart(ticker); // Assuming your chart code is encapsulated in a function
 
       // Clear the previous chart before appending the new one
