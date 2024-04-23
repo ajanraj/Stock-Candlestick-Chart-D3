@@ -37,13 +37,57 @@ function createChart(ticker) {
     )
     .style("-webkit-tap-highlight-color", "transparent")
     .style("overflow", "visible")
-    .on("pointerenter pointermove", pointermoved)
+    .on("pointerenter pointermove", (event) => pointermoved(event, x))
     .on("pointerleave", pointerleft)
-    .on("touchstart", (event) => event.preventDefault());
+    .on("touchstart", (event) => event.preventDefault())
+    .call(zoom);
+
+  svg
+    .append("defs")
+    .append("clipPath")
+    .attr("id", "clip")
+    .append("rect")
+    .attr("width", width - marginLeft - marginRight)
+    .attr("height", height - marginTop - marginBottom)
+    .attr("x", marginLeft)
+    .attr("y", marginTop);
+
+  function zoom(svg) {
+    const extent = [
+      [marginLeft, marginTop],
+      [width - marginRight, height - marginBottom],
+    ];
+
+    function change_line(x) {
+      const line = d3
+        .line()
+        .x((d) => x(d.Date))
+        .y((d) => y(d.Close));
+      svg.selectAll(".line-path").attr("d", line(ticker));
+    }
+
+    svg.call(
+      d3
+        .zoom()
+        .scaleExtent([1, 10]) // Control how much you can zoom in and out
+        .translateExtent(extent) // Limit panning to the size of the svg
+        .extent(extent) // Limit zooming to the size of the svg
+        .on("zoom", zoomed)
+    );
+
+    function zoomed(event) {
+      const newX = event.transform.rescaleX(x); // Rescale the x-axis based on the event
+      x.range(newX.range()); // Update the x scale's range
+      change_line(newX); // Update the line generator
+      svg.selectAll(".x-axis").call(d3.axisBottom(newX)); // Redraw the x-axis
+      svg.on("pointermove", (event) => pointermoved(event, newX)); // Update the tooltip
+    }
+  }
 
   // Add the x-axis.
   svg
     .append("g")
+    .attr("class", "x-axis")
     .attr("transform", `translate(0,${height - marginBottom})`)
     .call(
       d3
@@ -78,6 +122,8 @@ function createChart(ticker) {
   // Append a path for the line.
   svg
     .append("path")
+    .attr("clip-path", "url(#clip)")
+    .attr("class", "line-path")
     .attr("fill", "none")
     .attr("stroke", "steelblue")
     .attr("stroke-width", 1.5)
@@ -104,7 +150,8 @@ function createChart(ticker) {
 
   // Add the event listeners that show or hide the tooltip.
   const bisect = d3.bisector((d) => d.Date).center;
-  function pointermoved(event) {
+
+  function pointermoved(event, x) {
     const i = bisect(ticker, x.invert(d3.pointer(event)[0]));
     tooltip.style("display", null);
     tooltip.attr(
