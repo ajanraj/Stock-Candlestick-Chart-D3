@@ -194,5 +194,5 @@ function loadAndDisplayChart(csvFile) {
 
 // Initially load the chart for the first CSV file listed in the dropdown
 loadAndDisplayChart(
-  "../data/" + document.getElementById("stock-selector").value
+  "../Data/" + document.getElementById("stock-selector").value
 );
