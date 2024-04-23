@@ -437,3 +437,12 @@ function loadAndDisplayChart(csvFile) {
 loadAndDisplayChart(
   "../Data/" + document.getElementById("stock-selector").value
 );
+
+function updateCharts() {
+  const file = "../Data/" + document.getElementById("stock-selector").value;
+
+  Promise.all([loadAndDisplayChart(file)]);
+}
+
+// Load initial charts
+updateCharts();
