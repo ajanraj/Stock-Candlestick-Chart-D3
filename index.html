@@ -21,72 +21,146 @@
             <h3 class="pt-4 pb-4 px-1">D3 project</h3>
             <!--content stacking for smaller screens-->
             <ul class="nav nav-pills nav-stacked">
-              <!--internal linking to the respective sections-->
-              <a class="nav-link active" href="index.html" rel="internal">
-                <li>Introduction</li>
-              </a>
-              <a class="nav-link" href="index.html" rel="internal">
-                <li>Key information</li>
-              </a>
-              <a class="nav-link" href="index.html" rel="internal">
-                <li>About the data</li>
-              </a>
-              <a class="nav-link" href="html/CandleStick.html" rel="internal">
-                <li>CandleStick Chart</li>
-              </a>
-              <a class="nav-link" href="html/LineChart.html" rel="internal">
-                <li>Line Chart</li>
-              </a>
+              <a
+                class="nav-link active"
+                href="#Introduction"
+                id="nav-introduction"
+                >Introduction</a
+              >
+              <a class="nav-link" href="#Key_Information" id="nav-key-info"
+                >Key information</a
+              >
+              <a class="nav-link" href="#About_the_data" id="nav-about-data"
+                >About the data</a
+              >
+              <a
+                class="nav-link"
+                href="html/CandleStick.html"
+                id="nav-candlestick"
+                >CandleStick Chart</a
+              >
+              <a class="nav-link" href="html/LineChart.html" id="nav-linechart"
+                >Line Chart</a
+              >
               <a
                 class="nav-link"
                 href="html/ComparisionChart.html"
-                rel="internal"
+                id="nav-comparison"
+                >Comparison Chart</a
               >
-                <li>ComparisionChart</li>
-              </a>
             </ul>
           </nav>
         </div>
-        <div class="col-md-10">
+        <div class="col-md-10 col-sm-12 col-xs-12">
           <h1 class="my-4">7CCSMSDV Data Visualisation Project 2024</h1>
-          <h2>How to Read a Candlestick Chart</h2>
-          <p>
-            A candlestick chart is a type of financial chart used to represent
-            the price movement of an asset over time. It is commonly used in
-            technical analysis to identify patterns and trends.
-          </p>
-          <p>
-            To read a candlestick chart, you need to understand the following
-            elements:
-          </p>
-          <ul>
-            <li>
-              <strong>Candlestick Body:</strong> The rectangular area between
-              the opening and closing prices. It is filled (colored) if the
-              closing price is lower than the opening price, and empty (not
-              colored) if the closing price is higher than the opening price.
-            </li>
-            <li>
-              <strong>Candlestick Wick:</strong> The thin lines (shadows) above
-              and below the body, representing the high and low prices during
-              the time period.
-            </li>
-            <li>
-              <strong>Bullish Candlestick:</strong> A candlestick where the
-              closing price is higher than the opening price. It indicates
-              buying pressure and is often associated with a price increase.
-            </li>
-            <li>
-              <strong>Bearish Candlestick:</strong> A candlestick where the
-              closing price is lower than the opening price. It indicates
-              selling pressure and is often associated with a price decrease.
-            </li>
-          </ul>
-          <p>
-            By analyzing the patterns and formations of candlestick charts,
-            traders can make predictions about future price movements and make
-            informed trading decisions.
-          </p>
+          <h3>Kings College London</h3>
+          <h5>Department of Informatics</h5>
+          <h5>Ajan Raj</h5>
+          <h5><a>k23036535@kcl.ac.uk</a></h5>
+          <main>
+            <section id="Introduction">
+              <h2 class="text-light bg-dark my-3">Introduction</h2>
+              <p style="text-align: justify">
+                This project is a data visualisation project that uses D3.js to
+                create visualisations of stock data. The data is sourced from
+                Yahoo Finance and is in the form of CSV files. The
+                visualisations include a CandleStick Chart, a Line Chart and a
+                Comparison Chart.
+              </p>
+              <p>
+                These visualisations serve to answer Research Question 3 of part
+                3 of the Data Visualisation coursework
+              </p>
+              <li>
+                <code>
+                  Analyse the price movements of the stocks of various
+                  companies?
+                </code>
+              </li>
+              <p class="my-3">
+                Providing data for this research question - there are three
+                visualistions in total clickcable under the left-side navbar:
+              </p>
+              <li>A CandleStick Chart</li>
+              <li>A Line Chart</li>
+              <li>Lastly, a Comparision Chart</li>
+            </section>
+            <section id="Key_Information">
+              <h2 class="text-light bg-dark my-3">Key Information</h2>
+              <p>
+                Development of the visualizations was multi-faceted,
+                incorporating the following technologies and features:
+              </p>
+              <ul>
+                <li>HTML and JavaScript for structure and functionality</li>
+                <li>
+                  D3.js v.7 for dynamic data visualization, available at
+                  <a href="https://d3js.org">https://d3js.org</a>
+                </li>
+                <li>
+                  Interactive elements such as responsiveness on hover and zoom
+                </li>
+                <li>Custom CSS for improved user experience</li>
+              </ul>
+              <p>
+                As an open-source project, each visualization builds upon the
+                work of other developers, detailed as follows:
+              </p>
+              <h5>Candlestick Chart</h5>
+              <p>
+                This chart is based on code developed by the D3 community,
+                available at
+                <a
+                  href="https://observablehq.com/@d3/candlestick-chart/2"
+                  target="_blank"
+                  >https://observablehq.com/@d3/candlestick-chart/2</a
+                >.
+              </p>
+
+              <h5>Line Chart</h5>
+              <p>
+                This chart is based on code developed by the D3 community,
+                available at
+                <a
+                  href="https://observablehq.com/@d3/line-chart/2"
+                  target="_blank"
+                  >https://observablehq.com/@d3/line-chart/2</a
+                >.
+              </p>
+
+              <h5>Comparison Chart</h5>
+              <p>
+                This chart is based on code developed by the D3 community,
+                available at
+                <a
+                  href="https://observablehq.com/@d3/line-chart/2"
+                  target="_blank"
+                  >https://observablehq.com/@d3/line-chart/2</a
+                >.
+              </p>
+
+              <h5>User Interface</h5>
+              <p>
+                The UI was inspired by the work of Humphrey Curtis, with the
+                original project available at
+                <a
+                  href="https://github.com/HumphreyCurtis/7CCSMSDV-Project-Data-Visualisation-2/"
+                  target="_blank"
+                  >https://github.com/HumphreyCurtis/7CCSMSDV-Project-Data-Visualisation-2/</a
+                >.
+              </p>
+            </section>
+
+            <section id="About_the_data">
+              <h2 class="text-light bg-dark my-3">About the data</h2>
+              <p class="text-justify">
+                The data is sourced from Yahoo Finance and is in the form of CSV
+                files. The data includes the stock prices of various companies.
+                The data is in the form of a CSV file and includes the following
+                columns: Date, Open, High, Low, Close, Adj Close and Volume.
+              </p>
+            </section>
+          </main>
         </div>
       </div>
     </div>
@@ -95,5 +169,6 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
+    <script src="javascript/script.js"></script>
   </body>
 </html>

@@ -102,7 +102,49 @@ function createChart(ticker1, ticker2) {
     .attr("stroke-width", 1.5)
     .attr("d", line2(ticker2));
 
-  // Create the tooltip container.
+  const stock1 =
+    document.getElementById("stock-selector1").selectedOptions[0].text;
+  const stock2 =
+    document.getElementById("stock-selector2").selectedOptions[0].text;
+
+  // Append legend at the top right corner of the chart
+  const stocks = [
+    { name: stock1, color: "steelblue" },
+    { name: stock2, color: "red" },
+  ];
+
+  // Append legend at the top right corner of the chart
+  const legend = svg
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${width - marginRight - 50},${marginTop - 40})`
+    )
+    .attr("font-family", "sans-serif")
+    .attr("font-size", 10)
+    .attr("text-anchor", "end")
+    .selectAll("g")
+    .data(stocks) // Use the stocks array for legend data
+    .join("g")
+    .attr("transform", (d, i) => `translate(0,${i * 20})`);
+
+  // Append a rectangle to each legend entry
+  legend
+    .append("rect")
+    .attr("x", 30)
+    .attr("width", 19)
+    .attr("height", 19)
+    .attr("fill", (d) => d.color); // Use color from the stock object
+
+  // Append text to each legend entry
+  legend
+    .append("text")
+    .attr("x", 24)
+    .attr("y", 9.5)
+    .attr("dy", "0.35em")
+    .text((d) => d.name); // Use name from the stock object
+
+  // Create the tooltip container for stock 1.
   const tooltip = svg.append("g");
 
   function formatValue(value) {
@@ -123,14 +165,45 @@ function createChart(ticker1, ticker2) {
 
   // Add the event listeners that show or hide the tooltip.
   const bisect = d3.bisector((d1) => d1.Date).center;
-  function pointermoved(event) {
-    const i = bisect(ticker1, x.invert(d3.pointer(event)[0]));
-    tooltip.style("display", null);
-    tooltip.attr(
-      "transform",
-      `translate(${x(ticker1[i].Date)},${y(ticker1[i].Close)})`
-    );
 
+  function pointermoved(event) {
+    const pointerX = d3.pointer(event)[0]; // Get the x position of the pointer
+    const date1 = x.invert(pointerX); // Convert the x position to a date using scale x for ticker1
+    const date2 = x.invert(pointerX); // Same for ticker2
+
+    const i1 = bisect(ticker1, date1); // Find index of nearest data point in ticker1
+    const i2 = bisect(ticker2, date2); // Find index of nearest data point in ticker2
+
+    // Show tooltip for ticker1
+    tooltip
+      .style("display", null)
+      .attr(
+        "transform",
+        `translate(${x(ticker1[i1].Date)},${y(ticker1[i1].Close)})`
+      );
+
+    // Setup tooltip for ticker1
+    generateTooltipContent(tooltip, ticker1[i1]);
+
+    // Show tooltip for ticker2
+    const tooltip2 = svg
+      .selectAll(".tooltip2")
+      .data([null])
+      .join("g")
+      .classed("tooltip2", true);
+
+    tooltip2
+      .style("display", null)
+      .attr(
+        "transform",
+        `translate(${x(ticker2[i2].Date)},${y(ticker2[i2].Close)})`
+      );
+
+    // Setup tooltip for ticker2
+    generateTooltipContent(tooltip2, ticker2[i2]);
+  }
+
+  function generateTooltipContent(tooltip, data) {
     const path = tooltip
       .selectAll("path")
       .data([,])
@@ -145,7 +218,7 @@ function createChart(ticker1, ticker2) {
       .call((text) =>
         text
           .selectAll("tspan")
-          .data([formatDate(ticker1[i].Date), formatValue(ticker1[i].Close)])
+          .data([formatDate(data.Date), formatValue(data.Close)])
           .join("tspan")
           .attr("x", 0)
           .attr("y", (_, i) => `${i * 1.1}em`)
@@ -158,6 +231,7 @@ function createChart(ticker1, ticker2) {
 
   function pointerleft() {
     tooltip.style("display", "none");
+    svg.selectAll(".tooltip2").style("display", "none");
   }
 
   // Wraps the text with a callout path of the correct size, as measured in the page.
